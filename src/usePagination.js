@@ -12,52 +12,32 @@ export const usePagination = (dataEntries, elementsOnPage = 50) => {
   }, [dataEntries, elementsOnPage]);
 
   useEffect(() => {
+    setBusy(true);
+    const busyMode = setTimeout(() => {
+      setBusy(false);
+    }, 333);
+
     const dataForCurrentPage = dataEntries.slice(
       actualPageIdx * elementsOnPage,
       actualPageIdx * elementsOnPage + elementsOnPage
     );
+
     setEntries(dataForCurrentPage);
+    return () => {
+      clearTimeout(busyMode);
+    };
   }, [actualPageIdx, dataEntries, elementsOnPage]);
 
-  const runBusyMode = () => {
-    setBusy(true);
-    setTimeout(() => {
-      setBusy(false);
-    }, 333);
-  };
-  const goToFirstPage = () => {
-    runBusyMode();
-    setActualPage(0);
-  };
-
-  const goToPrevPage = () => {
-    runBusyMode();
-    if (actualPageIdx === 0) return;
-    setActualPage(actualPageIdx - 1);
-  };
-
-  const goToPage = (number) => {
-    runBusyMode();
-    setActualPage(number - 1);
-  };
-
-  const goToNextPage = () => {
-    runBusyMode();
-    if (actualPageIdx === lastPageIdx) return;
-    setActualPage(actualPageIdx + 1);
-  };
-
-  const goToLastPage = () => {
-    runBusyMode();
-    setActualPage(lastPageIdx);
+  const goTo = (number) => {
+    setActualPage(number);
   };
 
   const paginationActions = {
-    goToFirstPage,
-    goToLastPage,
-    goToNextPage,
-    goToPage,
-    goToPrevPage,
+    goToFirstPage: () => goTo(0),
+    goToLastPage: () => goTo(lastPageIdx),
+    goToNextPage: () => goTo(actualPageIdx + 1),
+    goToPrevPage: () => goTo(actualPageIdx - 1),
+    goToPage: (number) => goTo(number - 1),
   };
   const paginationState = {
     actualPageIdx,
